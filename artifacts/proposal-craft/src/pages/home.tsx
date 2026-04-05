@@ -254,15 +254,15 @@ export default function Home() {
             </Card>
             
             {/* Pro Tier */}
-            <Card className="border-primary shadow-lg shadow-primary/5 relative">
-              <div className="absolute top-0 inset-x-0 h-1 bg-primary rounded-t-xl"></div>
+            <Card className="border-border/40 shadow-sm relative opacity-70 bg-muted/20">
+              <div className="absolute top-0 inset-x-0 h-1 bg-muted-foreground/30 rounded-t-xl"></div>
               <div className="absolute -top-3 inset-x-0 flex justify-center">
-                <span className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Most Popular</span>
+                <span className="bg-muted-foreground/20 text-muted-foreground text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-muted-foreground/20">Coming Soon</span>
               </div>
               <CardHeader>
-                <CardTitle className="text-2xl">Pro</CardTitle>
+                <CardTitle className="text-2xl text-muted-foreground">Pro</CardTitle>
                 <CardDescription>For growing agencies and freelancers.</CardDescription>
-                <div className="mt-4 flex items-baseline text-5xl font-extrabold">
+                <div className="mt-4 flex items-baseline text-5xl font-extrabold text-muted-foreground">
                   ${isYearly ? "8.28" : "12"}
                   <span className="ml-1 text-xl font-medium text-muted-foreground">/mo</span>
                 </div>
@@ -270,13 +270,15 @@ export default function Home() {
               <CardContent>
                 <ul className="space-y-4 mb-8">
                   {["20 proposals/month", "All Free features", "JPG & PNG export", "Priority AI processing"].map((f, i) => (
-                    <li key={i} className="flex items-center gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                    <li key={i} className="flex items-center gap-3 text-muted-foreground">
+                      <CheckCircle2 className="h-5 w-5 flex-shrink-0 opacity-50" />
                       <span className="text-sm font-medium">{f}</span>
                     </li>
                   ))}
                 </ul>
-                <Button className="w-full" data-testid="pricing-pro-btn">Upgrade to Pro</Button>
+                <div className="w-full flex items-center justify-center py-2.5 px-4 rounded-lg border border-dashed border-muted-foreground/30 text-sm font-semibold text-muted-foreground" data-testid="pricing-pro-coming-soon">
+                  Coming Soon
+                </div>
               </CardContent>
             </Card>
           </div>

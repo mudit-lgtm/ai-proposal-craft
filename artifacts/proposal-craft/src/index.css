@@ -52,35 +52,41 @@
 }
 
 :root {
-  --background: 210 20% 98%;
-  --foreground: 222 47% 11%;
+  /* Off-white/warm cream background */
+  --background: 36 20% 97%;
+  --foreground: 215 40% 12%;
   
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 221 83% 53%;
+  /* Warm slate border */
+  --border: 220 18% 88%;
+  --input: 220 18% 88%;
+  /* Deep teal ring */
+  --ring: 185 60% 30%;
   
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --card-border: 214 32% 91%;
+  --card-foreground: 215 40% 12%;
+  --card-border: 220 18% 88%;
   
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --popover-border: 214 32% 91%;
+  --popover-foreground: 215 40% 12%;
+  --popover-border: 220 18% 88%;
   
-  --primary: 221 83% 53%;
-  --primary-foreground: 210 40% 98%;
+  /* Deep teal primary */
+  --primary: 185 60% 28%;
+  --primary-foreground: 36 20% 97%;
   
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
+  /* Warm slate secondary */
+  --secondary: 220 20% 94%;
+  --secondary-foreground: 215 40% 12%;
   
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
+  --muted: 220 20% 94%;
+  --muted-foreground: 215 18% 48%;
   
-  --accent: 210 40% 96.1%;
-  --accent-foreground: 222.2 47.4% 11.2%;
+  /* Warm amber accent */
+  --accent: 38 90% 94%;
+  --accent-foreground: 215 40% 12%;
   
   --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive-foreground: 36 20% 97%;
   
   --app-font-sans: 'Plus Jakarta Sans', sans-serif;
   --app-font-serif: 'Playfair Display', serif;
@@ -98,35 +104,37 @@
 }
 
 .dark {
-  --background: 222 47% 11%;
-  --foreground: 210 40% 98%;
+  /* Rich navy dark background */
+  --background: 215 40% 9%;
+  --foreground: 36 20% 95%;
   
-  --border: 217 33% 17%;
-  --input: 217 33% 17%;
-  --ring: 224 76% 48%;
+  --border: 215 30% 18%;
+  --input: 215 30% 18%;
+  --ring: 185 55% 40%;
   
-  --card: 222 47% 11%;
-  --card-foreground: 210 40% 98%;
-  --card-border: 217 33% 17%;
+  --card: 215 38% 11%;
+  --card-foreground: 36 20% 95%;
+  --card-border: 215 30% 18%;
   
-  --popover: 222 47% 11%;
-  --popover-foreground: 210 40% 98%;
-  --popover-border: 217 33% 17%;
+  --popover: 215 38% 11%;
+  --popover-foreground: 36 20% 95%;
+  --popover-border: 215 30% 18%;
   
-  --primary: 217 91% 60%;
-  --primary-foreground: 222 47% 11%;
+  /* Lighter teal for dark mode */
+  --primary: 185 55% 42%;
+  --primary-foreground: 215 40% 9%;
   
-  --secondary: 217 33% 17%;
-  --secondary-foreground: 210 40% 98%;
+  --secondary: 215 30% 18%;
+  --secondary-foreground: 36 20% 95%;
   
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20.2% 65.1%;
+  --muted: 215 30% 18%;
+  --muted-foreground: 215 18% 60%;
   
-  --accent: 217 33% 17%;
-  --accent-foreground: 210 40% 98%;
+  --accent: 38 60% 18%;
+  --accent-foreground: 36 20% 95%;
   
   --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive-foreground: 36 20% 95%;
 }
 
 @layer base {

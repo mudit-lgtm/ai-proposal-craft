@@ -12,7 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useLocation, Link } from "wouter";
 import { useGenerateProposal } from "@workspace/api-client-react";
-import { saveProposal, getProposals, FREE_TIER_LIMIT } from "@/lib/store";
+import { saveProposal, getProposals, FREE_TIER_LIMIT, isAdminLoggedIn } from "@/lib/store";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 
@@ -39,8 +39,9 @@ export default function Generate() {
   const [, setLocation] = useLocation();
   const generateMutation = useGenerateProposal();
 
+  const isAdmin = isAdminLoggedIn();
   const existingCount = getProposals().length;
-  const isAtLimit = existingCount >= FREE_TIER_LIMIT;
+  const isAtLimit = !isAdmin && existingCount >= FREE_TIER_LIMIT;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -68,7 +69,7 @@ export default function Generate() {
 
   async function onSubmit(values: FormValues) {
     if (isAtLimit) {
-      toast.error(`Free tier limit reached (${FREE_TIER_LIMIT} proposals). Upgrade to Pro for unlimited proposals.`);
+      toast.error(`Free tier limit reached (${FREE_TIER_LIMIT} proposals). Pro plan coming soon.`);
       return;
     }
 
@@ -128,16 +129,18 @@ export default function Generate() {
           </div>
           <h1 className="text-3xl font-bold mb-4">Free Tier Limit Reached</h1>
           <p className="text-muted-foreground mb-2">
-            You have used all <strong>{FREE_TIER_LIMIT} free proposals</strong>. Upgrade to Pro for unlimited proposal generation.
+            You have used all <strong>{FREE_TIER_LIMIT} free proposals</strong>.
           </p>
-          <p className="text-sm text-muted-foreground mb-8">
-            Manage your existing proposals from the dashboard, or upgrade to continue creating new ones.
+          <p className="text-sm text-muted-foreground mb-3">
+            Manage your existing proposals from the dashboard.
           </p>
+          <div className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 bg-slate-100 border border-slate-200 px-4 py-2 rounded-full mb-8">
+            Pro plan — Coming Soon
+          </div>
           <div className="flex gap-3 justify-center">
             <Link href="/dashboard">
               <Button variant="outline">View Dashboard</Button>
             </Link>
-            <Button>Upgrade to Pro</Button>
           </div>
         </div>
       </Layout>

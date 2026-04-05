@@ -20,7 +20,27 @@ export interface ProposalData {
 }
 
 const STORAGE_KEY = "proposalcraft_proposals";
+const ADMIN_SESSION_KEY = "proposalcraft_admin_session";
 export const FREE_TIER_LIMIT = 3;
+
+const ADMIN_EMAIL = "theerrorstreet@gmail.com";
+const ADMIN_PASSWORD = "JustDEmo@832374??";
+
+export function adminLogin(email: string, password: string): boolean {
+  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    localStorage.setItem(ADMIN_SESSION_KEY, "true");
+    return true;
+  }
+  return false;
+}
+
+export function adminLogout() {
+  localStorage.removeItem(ADMIN_SESSION_KEY);
+}
+
+export function isAdminLoggedIn(): boolean {
+  return localStorage.getItem(ADMIN_SESSION_KEY) === "true";
+}
 
 export function getProposals(): ProposalData[] {
   const data = localStorage.getItem(STORAGE_KEY);

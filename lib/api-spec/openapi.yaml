@@ -5,8 +5,10 @@ info:
   version: 0.1.0
   description: API specification
 servers:
+  - url: https://aiproposalcraft.vercel.app/
+    description: Production server
   - url: /api
-    description: Base API path
+    description: Local development
 tags:
   - name: health
     description: Health operations

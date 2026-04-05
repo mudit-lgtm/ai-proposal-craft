@@ -8,6 +8,7 @@ import Home from "./pages/home";
 import Generate from "./pages/generate";
 import Proposal from "./pages/proposal";
 import Dashboard from "./pages/dashboard";
+import Login from "./pages/login";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/generate" component={Generate} />
       <Route path="/proposal/:id" component={Proposal} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/login" component={Login} />
       <Route component={NotFound} />
     </Switch>
   );
