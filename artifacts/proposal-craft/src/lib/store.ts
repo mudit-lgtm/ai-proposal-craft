@@ -20,6 +20,7 @@ export interface ProposalData {
 }
 
 const STORAGE_KEY = "proposalcraft_proposals";
+export const FREE_TIER_LIMIT = 3;
 
 export function getProposals(): ProposalData[] {
   const data = localStorage.getItem(STORAGE_KEY);

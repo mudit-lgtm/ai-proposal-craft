@@ -6,18 +6,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
-import { Globe, LineChart, Users, MousePointerClick, ShieldCheck, Zap, PenTool, ArrowRight, ArrowLeft, Check, Loader2 } from "lucide-react";
+import { Globe, LineChart, Users, MousePointerClick, ShieldCheck, Zap, PenTool, ArrowRight, ArrowLeft, Check, Loader2, Lock } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useGenerateProposal } from "@workspace/api-client-react";
-import { saveProposal } from "@/lib/store";
+import { saveProposal, getProposals, FREE_TIER_LIMIT } from "@/lib/store";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 
+const SERVICE_IDS = ["seo", "website", "google-ads", "social-media", "orm", "lead-generation", "branding"] as const;
+type ServiceId = typeof SERVICE_IDS[number];
+
 const formSchema = z.object({
-  serviceType: z.enum(["seo", "website", "google-ads", "social-media", "orm", "lead-generation", "branding"] as const),
+  serviceType: z.enum(SERVICE_IDS),
   agencyName: z.string().min(2, "Agency name is required"),
   agencyContact: z.string().optional(),
   clientName: z.string().min(2, "Client name is required"),
@@ -27,12 +30,19 @@ const formSchema = z.object({
   budget: z.string().optional(),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+type StepOneField = "serviceType";
+type StepTwoField = "agencyName";
+
 export default function Generate() {
   const [step, setStep] = useState(1);
   const [, setLocation] = useLocation();
   const generateMutation = useGenerateProposal();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const existingCount = getProposals().length;
+  const isAtLimit = existingCount >= FREE_TIER_LIMIT;
+
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       serviceType: "seo",
@@ -46,7 +56,7 @@ export default function Generate() {
     },
   });
 
-  const services = [
+  const services: { id: ServiceId; title: string; icon: React.ReactNode }[] = [
     { id: "website", title: "Website Design & Development", icon: <Globe className="h-8 w-8" /> },
     { id: "seo", title: "Search Engine Optimization", icon: <LineChart className="h-8 w-8" /> },
     { id: "social-media", title: "Social Media Marketing", icon: <Users className="h-8 w-8" /> },
@@ -54,9 +64,14 @@ export default function Generate() {
     { id: "orm", title: "Online Reputation Management", icon: <ShieldCheck className="h-8 w-8" /> },
     { id: "lead-generation", title: "Lead Generation Campaigns", icon: <Zap className="h-8 w-8" /> },
     { id: "branding", title: "Branding & Creative Services", icon: <PenTool className="h-8 w-8" /> }
-  ] as const;
+  ];
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormValues) {
+    if (isAtLimit) {
+      toast.error(`Free tier limit reached (${FREE_TIER_LIMIT} proposals). Upgrade to Pro for unlimited proposals.`);
+      return;
+    }
+
     try {
       const result = await generateMutation.mutateAsync({
         data: values
@@ -91,19 +106,43 @@ export default function Generate() {
   }
 
   const handleNext = () => {
-    const fieldsToValidate = step === 1 
-      ? ["serviceType"] 
-      : step === 2 
-        ? ["agencyName"] 
+    const fieldsToValidate: StepOneField[] | StepTwoField[] = step === 1
+      ? (["serviceType"] satisfies StepOneField[])
+      : step === 2
+        ? (["agencyName"] satisfies StepTwoField[])
         : [];
-        
-    // @ts-ignore
+
     form.trigger(fieldsToValidate).then((isValid) => {
       if (isValid) setStep(s => s + 1);
     });
   };
 
   const isGenerating = generateMutation.isPending;
+
+  if (isAtLimit) {
+    return (
+      <Layout>
+        <div className="container max-w-2xl mx-auto px-4 py-20 text-center">
+          <div className="p-6 rounded-full bg-amber-100 text-amber-600 w-20 h-20 flex items-center justify-center mx-auto mb-6">
+            <Lock className="h-10 w-10" />
+          </div>
+          <h1 className="text-3xl font-bold mb-4">Free Tier Limit Reached</h1>
+          <p className="text-muted-foreground mb-2">
+            You have used all <strong>{FREE_TIER_LIMIT} free proposals</strong>. Upgrade to Pro for unlimited proposal generation.
+          </p>
+          <p className="text-sm text-muted-foreground mb-8">
+            Manage your existing proposals from the dashboard, or upgrade to continue creating new ones.
+          </p>
+          <div className="flex gap-3 justify-center">
+            <Link href="/dashboard">
+              <Button variant="outline">View Dashboard</Button>
+            </Link>
+            <Button>Upgrade to Pro</Button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -142,7 +181,7 @@ export default function Generate() {
                   {services.map((service) => (
                     <div 
                       key={service.id}
-                      onClick={() => form.setValue("serviceType", service.id as any)}
+                      onClick={() => form.setValue("serviceType", service.id)}
                       className={`cursor-pointer rounded-xl border p-6 flex flex-col items-center text-center gap-4 transition-all ${
                         form.watch("serviceType") === service.id 
                           ? "border-primary bg-primary/5 ring-2 ring-primary/20" 
@@ -306,7 +345,7 @@ export default function Generate() {
                   <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
               ) : (
-                <div /> // Spacer
+                <div />
               )}
 
               {step < 3 ? (

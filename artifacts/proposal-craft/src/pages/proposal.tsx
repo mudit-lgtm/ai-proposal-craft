@@ -180,7 +180,7 @@ export default function Proposal() {
 
       <div className="container mx-auto px-4 py-8 bg-muted/10 min-h-[calc(100vh-128px)]">
         {/* Proposal Document Canvas */}
-        <div className="max-w-[1000px] mx-auto shadow-2xl rounded-sm overflow-hidden bg-white mb-20 relative">
+        <div ref={proposalRef} className="max-w-[1000px] mx-auto shadow-2xl rounded-sm overflow-hidden bg-white mb-20 relative">
           
           {/* Header styling differs per template */}
           {template === 'linear' && (
@@ -267,7 +267,6 @@ export default function Proposal() {
           )}
 
           <div 
-            ref={proposalRef}
             className={`p-12 lg:p-16 min-h-[800px] ${templates[template] || templates.linear}`}
           >
             {Object.entries(proposal.content).map(([key, content], index) => {

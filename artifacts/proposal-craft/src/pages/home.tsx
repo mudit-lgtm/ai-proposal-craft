@@ -1,15 +1,31 @@
 import { Layout } from "@/components/layout/layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { ArrowRight, CheckCircle2, ChevronRight, FileText, Globe, Layers, LineChart, MessageSquare, MousePointerClick, PenTool, PieChart, ShieldCheck, Star, Users, Zap } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronRight, FileText, Globe, Layers, LineChart, MessageSquare, MousePointerClick, PenTool, PieChart, ShieldCheck, Star, Users, Zap, ChevronLeft } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const TESTIMONIALS = [
+  { quote: "ProposalCraft AI cut our proposal creation time from 3 hours to 15 minutes.", name: "Priya Mehta", title: "BrightEdge Digital" },
+  { quote: "We switched from Proposify and saved $200/month. The quality is just as good, if not better.", name: "Carlos Rivera", title: "Apex Media Group" },
+  { quote: "Proposals look like I hired a designer. It makes me look so much more professional to my clients.", name: "Hannah Osei", title: "Freelance Marketing Consultant" },
+  { quote: "Generated 5 client proposals in one afternoon. Closed 3 of them. The ROI is incredible.", name: "James Thornton", title: "Thornton Growth Partners" },
+  { quote: "The template variety is outstanding. Each client gets something that feels uniquely crafted for them.", name: "Sofia Delgado", title: "Mosaic Creative Agency" },
+];
 
 export default function Home() {
   const [isYearly, setIsYearly] = useState(false);
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTestimonial(i => (i + 1) % TESTIMONIALS.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   const services = [
     { title: "Website Design & Development", icon: <Globe className="h-6 w-6" />, desc: "Convert visitors with stunning, high-performing websites." },
@@ -267,35 +283,70 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 md:py-32 bg-muted/30">
+      {/* Testimonials Carousel */}
+      <section className="py-20 md:py-32 bg-muted/30 overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Trusted by Professionals</h2>
             <p className="mt-4 text-lg text-muted-foreground">Hear what marketing agencies are saying.</p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              { quote: "ProposalCraft AI cut our proposal creation time from 3 hours to 15 minutes.", name: "Priya Mehta", title: "BrightEdge Digital" },
-              { quote: "We switched from Proposify and saved $200/month. The quality is just as good, if not better.", name: "Carlos Rivera", title: "Apex Media Group" },
-              { quote: "Proposals look like I hired a designer. It makes me look so much more professional to my clients.", name: "Hannah Osei", title: "Freelance Marketing Consultant" }
-            ].map((t, i) => (
-              <Card key={i} className="bg-background border-border shadow-sm">
-                <CardContent className="pt-6">
-                  <div className="flex mb-4">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                    ))}
-                  </div>
-                  <p className="text-lg italic mb-6 text-foreground leading-relaxed">"{t.quote}"</p>
-                  <div>
-                    <p className="font-bold">{t.name}</p>
-                    <p className="text-sm text-muted-foreground">{t.title}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="max-w-3xl mx-auto relative">
+            <div className="overflow-hidden rounded-2xl">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTestimonial}
+                  initial={{ opacity: 0, x: 60 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -60 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                >
+                  <Card className="bg-background border-border shadow-md">
+                    <CardContent className="pt-10 pb-10 px-12 text-center">
+                      <div className="flex justify-center mb-6">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star key={star} className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                        ))}
+                      </div>
+                      <p className="text-xl md:text-2xl italic mb-8 text-foreground leading-relaxed">
+                        "{TESTIMONIALS[activeTestimonial].quote}"
+                      </p>
+                      <div>
+                        <p className="font-bold text-lg">{TESTIMONIALS[activeTestimonial].name}</p>
+                        <p className="text-muted-foreground">{TESTIMONIALS[activeTestimonial].title}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            <div className="flex items-center justify-center gap-4 mt-8">
+              <button
+                onClick={() => setActiveTestimonial(i => (i - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)}
+                className="p-2 rounded-full border border-border hover:bg-muted transition-colors"
+                aria-label="Previous testimonial"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <div className="flex gap-2">
+                {TESTIMONIALS.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveTestimonial(i)}
+                    className={`w-2 h-2 rounded-full transition-all ${i === activeTestimonial ? 'bg-primary w-6' : 'bg-muted-foreground/40'}`}
+                    aria-label={`Go to testimonial ${i + 1}`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={() => setActiveTestimonial(i => (i + 1) % TESTIMONIALS.length)}
+                className="p-2 rounded-full border border-border hover:bg-muted transition-colors"
+                aria-label="Next testimonial"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
