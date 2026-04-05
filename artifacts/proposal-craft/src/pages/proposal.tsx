@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Layout } from "@/components/layout/layout";
 import { useRoute, Link } from "wouter";
-import { getProposal, updateProposalStatus } from "@/lib/store";
+import { getProposal, saveProposal, updateProposalStatus, ProposalData } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, ArrowLeft, Send } from "lucide-react";
@@ -97,6 +97,21 @@ export default function Proposal() {
       toast.success("Marked as sent");
     }
   };
+
+  const handleSectionBlur = useCallback(
+    (sectionKey: keyof ProposalData["content"], e: React.FocusEvent<HTMLDivElement>) => {
+      if (!proposal) return;
+      const newText = e.currentTarget.innerText;
+      if (newText === proposal.content[sectionKey]) return;
+      const updated: ProposalData = {
+        ...proposal,
+        content: { ...proposal.content, [sectionKey]: newText },
+      };
+      setProposal(updated);
+      saveProposal(updated);
+    },
+    [proposal]
+  );
 
   const templates: Record<string, string> = {
     linear: "font-sans bg-white text-slate-900 border-l-8 border-indigo-600",
@@ -269,8 +284,8 @@ export default function Proposal() {
           <div 
             className={`p-12 lg:p-16 min-h-[800px] ${templates[template] || templates.linear}`}
           >
-            {Object.entries(proposal.content).map(([key, content], index) => {
-              const formattedTitle = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+            {(Object.entries(proposal.content) as [keyof ProposalData["content"], string][]).map(([key, content]) => {
+              const formattedTitle = (key as string).replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
               return (
                 <div key={key} className={`group relative ${getSectionClasses(template)}`}>
                   <div className="absolute -left-4 top-0 bottom-0 w-1 bg-primary/0 group-hover:bg-primary/20 transition-colors rounded-full" />
@@ -282,6 +297,7 @@ export default function Proposal() {
                   <div 
                     contentEditable 
                     suppressContentEditableWarning 
+                    onBlur={(e) => handleSectionBlur(key, e)}
                     className="outline-none focus:ring-2 focus:ring-primary/20 focus:bg-primary/5 rounded-md p-2 -ml-2 transition-colors"
                   >
                     {renderContent(content)}
