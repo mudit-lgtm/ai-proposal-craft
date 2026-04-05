@@ -29,6 +29,14 @@ export const GenerateProposalBody = zod.object({
       "orm",
       "lead-generation",
       "branding",
+      "email-marketing",
+      "content-marketing",
+      "video-marketing",
+      "influencer-marketing",
+      "ppc",
+      "e-commerce",
+      "analytics",
+      "app-marketing",
     ])
     .describe("Type of digital marketing service"),
   agencyName: zod.string().describe("Name of the proposing agency"),
@@ -36,6 +44,7 @@ export const GenerateProposalBody = zod.object({
     .string()
     .optional()
     .describe("Contact details of the agency"),
+  agencyLogoUrl: zod.string().optional().describe("URL of agency logo"),
   clientName: zod.string().describe("Name of the client"),
   clientCompany: zod.string().describe("Client company name"),
   clientIndustry: zod
@@ -44,6 +53,20 @@ export const GenerateProposalBody = zod.object({
     .describe("Client industry\/business sector"),
   clientGoals: zod.string().describe("Client goals and objectives"),
   budget: zod.string().optional().describe("Proposed budget range"),
+  language: zod
+    .string()
+    .optional()
+    .describe(
+      "Language for proposal generation (e.g. English, Spanish, French)",
+    ),
+  tone: zod
+    .enum(["formal", "balanced", "conversational"])
+    .optional()
+    .describe("Writing tone for the proposal"),
+  validityDays: zod
+    .number()
+    .optional()
+    .describe("Number of days the proposal is valid"),
 });
 
 export const GenerateProposalResponse = zod.object({
@@ -59,4 +82,39 @@ export const GenerateProposalResponse = zod.object({
   clientName: zod.string(),
   clientCompany: zod.string(),
   generatedAt: zod.coerce.date(),
+});
+
+/**
+ * Uses AI to rewrite one section of an existing proposal
+ * @summary Regenerate a single proposal section
+ */
+export const RegenerateSectionBody = zod.object({
+  sectionKey: zod.string().describe("The key of the section to regenerate"),
+  serviceType: zod.string().describe("Type of digital marketing service"),
+  agencyName: zod.string(),
+  clientName: zod.string(),
+  clientCompany: zod.string(),
+  clientGoals: zod.string(),
+  tone: zod.string().optional(),
+  language: zod.string().optional(),
+});
+
+export const RegenerateSectionResponse = zod.object({
+  content: zod.string(),
+});
+
+/**
+ * Generate a professional follow-up email for a sent proposal
+ * @summary Generate a follow-up email template
+ */
+export const GenerateFollowUpEmailBody = zod.object({
+  agencyName: zod.string(),
+  clientName: zod.string(),
+  clientCompany: zod.string(),
+  serviceType: zod.string(),
+});
+
+export const GenerateFollowUpEmailResponse = zod.object({
+  subject: zod.string(),
+  body: zod.string(),
 });

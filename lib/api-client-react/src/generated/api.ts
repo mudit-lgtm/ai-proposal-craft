@@ -18,9 +18,13 @@ import type {
 
 import type {
   ApiError,
+  FollowUpEmailBody,
+  FollowUpEmailResponse,
   GenerateProposalBody,
   GenerateProposalResponse,
   HealthStatus,
+  RegenerateSectionBody,
+  RegenerateSectionResponse,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -193,4 +197,178 @@ export const useGenerateProposal = <
   TContext
 > => {
   return useMutation(getGenerateProposalMutationOptions(options));
+};
+
+/**
+ * Uses AI to rewrite one section of an existing proposal
+ * @summary Regenerate a single proposal section
+ */
+export const getRegenerateSectionUrl = () => {
+  return `/api/proposals/regenerate-section`;
+};
+
+export const regenerateSection = async (
+  regenerateSectionBody: RegenerateSectionBody,
+  options?: RequestInit,
+): Promise<RegenerateSectionResponse> => {
+  return customFetch<RegenerateSectionResponse>(getRegenerateSectionUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(regenerateSectionBody),
+  });
+};
+
+export const getRegenerateSectionMutationOptions = <
+  TError = ErrorType<ApiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof regenerateSection>>,
+    TError,
+    { data: BodyType<RegenerateSectionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof regenerateSection>>,
+  TError,
+  { data: BodyType<RegenerateSectionBody> },
+  TContext
+> => {
+  const mutationKey = ["regenerateSection"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof regenerateSection>>,
+    { data: BodyType<RegenerateSectionBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return regenerateSection(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RegenerateSectionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof regenerateSection>>
+>;
+export type RegenerateSectionMutationBody = BodyType<RegenerateSectionBody>;
+export type RegenerateSectionMutationError = ErrorType<ApiError>;
+
+/**
+ * @summary Regenerate a single proposal section
+ */
+export const useRegenerateSection = <
+  TError = ErrorType<ApiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof regenerateSection>>,
+    TError,
+    { data: BodyType<RegenerateSectionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof regenerateSection>>,
+  TError,
+  { data: BodyType<RegenerateSectionBody> },
+  TContext
+> => {
+  return useMutation(getRegenerateSectionMutationOptions(options));
+};
+
+/**
+ * Generate a professional follow-up email for a sent proposal
+ * @summary Generate a follow-up email template
+ */
+export const getGenerateFollowUpEmailUrl = () => {
+  return `/api/proposals/follow-up-email`;
+};
+
+export const generateFollowUpEmail = async (
+  followUpEmailBody: FollowUpEmailBody,
+  options?: RequestInit,
+): Promise<FollowUpEmailResponse> => {
+  return customFetch<FollowUpEmailResponse>(getGenerateFollowUpEmailUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(followUpEmailBody),
+  });
+};
+
+export const getGenerateFollowUpEmailMutationOptions = <
+  TError = ErrorType<ApiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateFollowUpEmail>>,
+    TError,
+    { data: BodyType<FollowUpEmailBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generateFollowUpEmail>>,
+  TError,
+  { data: BodyType<FollowUpEmailBody> },
+  TContext
+> => {
+  const mutationKey = ["generateFollowUpEmail"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generateFollowUpEmail>>,
+    { data: BodyType<FollowUpEmailBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return generateFollowUpEmail(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GenerateFollowUpEmailMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateFollowUpEmail>>
+>;
+export type GenerateFollowUpEmailMutationBody = BodyType<FollowUpEmailBody>;
+export type GenerateFollowUpEmailMutationError = ErrorType<ApiError>;
+
+/**
+ * @summary Generate a follow-up email template
+ */
+export const useGenerateFollowUpEmail = <
+  TError = ErrorType<ApiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateFollowUpEmail>>,
+    TError,
+    { data: BodyType<FollowUpEmailBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generateFollowUpEmail>>,
+  TError,
+  { data: BodyType<FollowUpEmailBody> },
+  TContext
+> => {
+  return useMutation(getGenerateFollowUpEmailMutationOptions(options));
 };

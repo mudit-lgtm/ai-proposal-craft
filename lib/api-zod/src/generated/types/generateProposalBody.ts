@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { GenerateProposalBodyServiceType } from "./generateProposalBodyServiceType";
+import type { GenerateProposalBodyTone } from "./generateProposalBodyTone";
 
 export interface GenerateProposalBody {
   /** Type of digital marketing service */
@@ -14,6 +15,8 @@ export interface GenerateProposalBody {
   agencyName: string;
   /** Contact details of the agency */
   agencyContact?: string;
+  /** URL of agency logo */
+  agencyLogoUrl?: string;
   /** Name of the client */
   clientName: string;
   /** Client company name */
@@ -24,4 +27,10 @@ export interface GenerateProposalBody {
   clientGoals: string;
   /** Proposed budget range */
   budget?: string;
+  /** Language for proposal generation (e.g. English, Spanish, French) */
+  language?: string;
+  /** Writing tone for the proposal */
+  tone?: GenerateProposalBodyTone;
+  /** Number of days the proposal is valid */
+  validityDays?: number;
 }

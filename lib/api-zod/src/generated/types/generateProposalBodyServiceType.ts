@@ -20,4 +20,12 @@ export const GenerateProposalBodyServiceType = {
   orm: "orm",
   "lead-generation": "lead-generation",
   branding: "branding",
+  "email-marketing": "email-marketing",
+  "content-marketing": "content-marketing",
+  "video-marketing": "video-marketing",
+  "influencer-marketing": "influencer-marketing",
+  ppc: "ppc",
+  "e-commerce": "e-commerce",
+  analytics: "analytics",
+  "app-marketing": "app-marketing",
 } as const;

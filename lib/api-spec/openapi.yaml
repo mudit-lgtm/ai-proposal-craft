@@ -59,6 +59,68 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiError"
+  /proposals/regenerate-section:
+    post:
+      operationId: regenerateSection
+      tags: [proposals]
+      summary: Regenerate a single proposal section
+      description: Uses AI to rewrite one section of an existing proposal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegenerateSectionBody"
+      responses:
+        "200":
+          description: Regenerated section content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegenerateSectionResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /proposals/follow-up-email:
+    post:
+      operationId: generateFollowUpEmail
+      tags: [proposals]
+      summary: Generate a follow-up email template
+      description: Generate a professional follow-up email for a sent proposal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FollowUpEmailBody"
+      responses:
+        "200":
+          description: Generated email content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FollowUpEmailResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
   schemas:
     HealthStatus:
@@ -81,6 +143,14 @@ components:
             - orm
             - lead-generation
             - branding
+            - email-marketing
+            - content-marketing
+            - video-marketing
+            - influencer-marketing
+            - ppc
+            - e-commerce
+            - analytics
+            - app-marketing
           description: Type of digital marketing service
         agencyName:
           type: string
@@ -88,6 +158,9 @@ components:
         agencyContact:
           type: string
           description: Contact details of the agency
+        agencyLogoUrl:
+          type: string
+          description: URL of agency logo
         clientName:
           type: string
           description: Name of the client
@@ -103,6 +176,19 @@ components:
         budget:
           type: string
           description: Proposed budget range
+        language:
+          type: string
+          description: Language for proposal generation (e.g. English, Spanish, French)
+        tone:
+          type: string
+          enum:
+            - formal
+            - balanced
+            - conversational
+          description: Writing tone for the proposal
+        validityDays:
+          type: number
+          description: Number of days the proposal is valid
       required:
         - serviceType
         - agencyName
@@ -150,6 +236,67 @@ components:
         - clientName
         - clientCompany
         - generatedAt
+    RegenerateSectionBody:
+      type: object
+      properties:
+        sectionKey:
+          type: string
+          description: The key of the section to regenerate
+        serviceType:
+          type: string
+          description: Type of digital marketing service
+        agencyName:
+          type: string
+        clientName:
+          type: string
+        clientCompany:
+          type: string
+        clientGoals:
+          type: string
+        tone:
+          type: string
+        language:
+          type: string
+      required:
+        - sectionKey
+        - serviceType
+        - agencyName
+        - clientName
+        - clientCompany
+        - clientGoals
+    RegenerateSectionResponse:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+    FollowUpEmailBody:
+      type: object
+      properties:
+        agencyName:
+          type: string
+        clientName:
+          type: string
+        clientCompany:
+          type: string
+        serviceType:
+          type: string
+      required:
+        - agencyName
+        - clientName
+        - clientCompany
+        - serviceType
+    FollowUpEmailResponse:
+      type: object
+      properties:
+        subject:
+          type: string
+        body:
+          type: string
+      required:
+        - subject
+        - body
     ApiError:
       type: object
       properties:

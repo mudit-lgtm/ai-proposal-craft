@@ -7,7 +7,12 @@
  */
 
 export * from "./apiError";
+export * from "./followUpEmailBody";
+export * from "./followUpEmailResponse";
 export * from "./generateProposalBody";
 export * from "./generateProposalBodyServiceType";
+export * from "./generateProposalBodyTone";
 export * from "./generateProposalResponse";
 export * from "./healthStatus";
+export * from "./regenerateSectionBody";
+export * from "./regenerateSectionResponse";

@@ -23,6 +23,26 @@ export const GenerateProposalBodyServiceType = {
   orm: "orm",
   "lead-generation": "lead-generation",
   branding: "branding",
+  "email-marketing": "email-marketing",
+  "content-marketing": "content-marketing",
+  "video-marketing": "video-marketing",
+  "influencer-marketing": "influencer-marketing",
+  ppc: "ppc",
+  "e-commerce": "e-commerce",
+  analytics: "analytics",
+  "app-marketing": "app-marketing",
+} as const;
+
+/**
+ * Writing tone for the proposal
+ */
+export type GenerateProposalBodyTone =
+  (typeof GenerateProposalBodyTone)[keyof typeof GenerateProposalBodyTone];
+
+export const GenerateProposalBodyTone = {
+  formal: "formal",
+  balanced: "balanced",
+  conversational: "conversational",
 } as const;
 
 export interface GenerateProposalBody {
@@ -32,6 +52,8 @@ export interface GenerateProposalBody {
   agencyName: string;
   /** Contact details of the agency */
   agencyContact?: string;
+  /** URL of agency logo */
+  agencyLogoUrl?: string;
   /** Name of the client */
   clientName: string;
   /** Client company name */
@@ -42,6 +64,12 @@ export interface GenerateProposalBody {
   clientGoals: string;
   /** Proposed budget range */
   budget?: string;
+  /** Language for proposal generation (e.g. English, Spanish, French) */
+  language?: string;
+  /** Writing tone for the proposal */
+  tone?: GenerateProposalBodyTone;
+  /** Number of days the proposal is valid */
+  validityDays?: number;
 }
 
 export interface GenerateProposalResponse {
@@ -57,6 +85,35 @@ export interface GenerateProposalResponse {
   clientName: string;
   clientCompany: string;
   generatedAt: string;
+}
+
+export interface RegenerateSectionBody {
+  /** The key of the section to regenerate */
+  sectionKey: string;
+  /** Type of digital marketing service */
+  serviceType: string;
+  agencyName: string;
+  clientName: string;
+  clientCompany: string;
+  clientGoals: string;
+  tone?: string;
+  language?: string;
+}
+
+export interface RegenerateSectionResponse {
+  content: string;
+}
+
+export interface FollowUpEmailBody {
+  agencyName: string;
+  clientName: string;
+  clientCompany: string;
+  serviceType: string;
+}
+
+export interface FollowUpEmailResponse {
+  subject: string;
+  body: string;
 }
 
 export interface ApiError {
