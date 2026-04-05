@@ -8,3 +8,57 @@
 export interface HealthStatus {
   status: string;
 }
+
+/**
+ * Type of digital marketing service
+ */
+export type GenerateProposalBodyServiceType =
+  (typeof GenerateProposalBodyServiceType)[keyof typeof GenerateProposalBodyServiceType];
+
+export const GenerateProposalBodyServiceType = {
+  seo: "seo",
+  website: "website",
+  "google-ads": "google-ads",
+  "social-media": "social-media",
+  orm: "orm",
+  "lead-generation": "lead-generation",
+  branding: "branding",
+} as const;
+
+export interface GenerateProposalBody {
+  /** Type of digital marketing service */
+  serviceType: GenerateProposalBodyServiceType;
+  /** Name of the proposing agency */
+  agencyName: string;
+  /** Contact details of the agency */
+  agencyContact?: string;
+  /** Name of the client */
+  clientName: string;
+  /** Client company name */
+  clientCompany: string;
+  /** Client industry/business sector */
+  clientIndustry?: string;
+  /** Client goals and objectives */
+  clientGoals: string;
+  /** Proposed budget range */
+  budget?: string;
+}
+
+export interface GenerateProposalResponse {
+  executiveSummary: string;
+  clientAnalysis: string;
+  proposedStrategy: string;
+  deliverablesAndTimeline: string;
+  teamAndExpertise: string;
+  pricingAndPackages: string;
+  termsAndConditions: string;
+  serviceType: string;
+  agencyName: string;
+  clientName: string;
+  clientCompany: string;
+  generatedAt: string;
+}
+
+export interface ApiError {
+  error: string;
+}

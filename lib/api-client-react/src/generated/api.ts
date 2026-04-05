@@ -5,18 +5,26 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  ApiError,
+  GenerateProposalBody,
+  GenerateProposalResponse,
+  HealthStatus,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -99,3 +107,90 @@ export function useHealthCheck<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * Generate a professional business proposal using AI based on provided details
+ * @summary Generate an AI proposal
+ */
+export const getGenerateProposalUrl = () => {
+  return `/api/proposals/generate`;
+};
+
+export const generateProposal = async (
+  generateProposalBody: GenerateProposalBody,
+  options?: RequestInit,
+): Promise<GenerateProposalResponse> => {
+  return customFetch<GenerateProposalResponse>(getGenerateProposalUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(generateProposalBody),
+  });
+};
+
+export const getGenerateProposalMutationOptions = <
+  TError = ErrorType<ApiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateProposal>>,
+    TError,
+    { data: BodyType<GenerateProposalBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generateProposal>>,
+  TError,
+  { data: BodyType<GenerateProposalBody> },
+  TContext
+> => {
+  const mutationKey = ["generateProposal"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generateProposal>>,
+    { data: BodyType<GenerateProposalBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return generateProposal(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GenerateProposalMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateProposal>>
+>;
+export type GenerateProposalMutationBody = BodyType<GenerateProposalBody>;
+export type GenerateProposalMutationError = ErrorType<ApiError>;
+
+/**
+ * @summary Generate an AI proposal
+ */
+export const useGenerateProposal = <
+  TError = ErrorType<ApiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateProposal>>,
+    TError,
+    { data: BodyType<GenerateProposalBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generateProposal>>,
+  TError,
+  { data: BodyType<GenerateProposalBody> },
+  TContext
+> => {
+  return useMutation(getGenerateProposalMutationOptions(options));
+};

@@ -14,3 +14,49 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Generate a professional business proposal using AI based on provided details
+ * @summary Generate an AI proposal
+ */
+export const GenerateProposalBody = zod.object({
+  serviceType: zod
+    .enum([
+      "seo",
+      "website",
+      "google-ads",
+      "social-media",
+      "orm",
+      "lead-generation",
+      "branding",
+    ])
+    .describe("Type of digital marketing service"),
+  agencyName: zod.string().describe("Name of the proposing agency"),
+  agencyContact: zod
+    .string()
+    .optional()
+    .describe("Contact details of the agency"),
+  clientName: zod.string().describe("Name of the client"),
+  clientCompany: zod.string().describe("Client company name"),
+  clientIndustry: zod
+    .string()
+    .optional()
+    .describe("Client industry\/business sector"),
+  clientGoals: zod.string().describe("Client goals and objectives"),
+  budget: zod.string().optional().describe("Proposed budget range"),
+});
+
+export const GenerateProposalResponse = zod.object({
+  executiveSummary: zod.string(),
+  clientAnalysis: zod.string(),
+  proposedStrategy: zod.string(),
+  deliverablesAndTimeline: zod.string(),
+  teamAndExpertise: zod.string(),
+  pricingAndPackages: zod.string(),
+  termsAndConditions: zod.string(),
+  serviceType: zod.string(),
+  agencyName: zod.string(),
+  clientName: zod.string(),
+  clientCompany: zod.string(),
+  generatedAt: zod.coerce.date(),
+});

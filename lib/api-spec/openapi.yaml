@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: proposals
+    description: AI Proposal generation operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /proposals/generate:
+    post:
+      operationId: generateProposal
+      tags: [proposals]
+      summary: Generate an AI proposal
+      description: Generate a professional business proposal using AI based on provided details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateProposalBody"
+      responses:
+        "200":
+          description: Generated proposal content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateProposalResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +66,92 @@ components:
           type: string
       required:
         - status
-
+    GenerateProposalBody:
+      type: object
+      properties:
+        serviceType:
+          type: string
+          enum:
+            - seo
+            - website
+            - google-ads
+            - social-media
+            - orm
+            - lead-generation
+            - branding
+          description: Type of digital marketing service
+        agencyName:
+          type: string
+          description: Name of the proposing agency
+        agencyContact:
+          type: string
+          description: Contact details of the agency
+        clientName:
+          type: string
+          description: Name of the client
+        clientCompany:
+          type: string
+          description: Client company name
+        clientIndustry:
+          type: string
+          description: Client industry/business sector
+        clientGoals:
+          type: string
+          description: Client goals and objectives
+        budget:
+          type: string
+          description: Proposed budget range
+      required:
+        - serviceType
+        - agencyName
+        - clientName
+        - clientCompany
+        - clientGoals
+    GenerateProposalResponse:
+      type: object
+      properties:
+        executiveSummary:
+          type: string
+        clientAnalysis:
+          type: string
+        proposedStrategy:
+          type: string
+        deliverablesAndTimeline:
+          type: string
+        teamAndExpertise:
+          type: string
+        pricingAndPackages:
+          type: string
+        termsAndConditions:
+          type: string
+        serviceType:
+          type: string
+        agencyName:
+          type: string
+        clientName:
+          type: string
+        clientCompany:
+          type: string
+        generatedAt:
+          type: string
+          format: date-time
+      required:
+        - executiveSummary
+        - clientAnalysis
+        - proposedStrategy
+        - deliverablesAndTimeline
+        - teamAndExpertise
+        - pricingAndPackages
+        - termsAndConditions
+        - serviceType
+        - agencyName
+        - clientName
+        - clientCompany
+        - generatedAt
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
