@@ -33,6 +33,68 @@ const LANGUAGES = [
   "Dutch", "Japanese", "Chinese", "Arabic", "Hindi", "Russian"
 ];
 
+const INDUSTRIES = [
+  "Technology & Software",
+  "E-Commerce & Retail",
+  "Healthcare & Medical",
+  "Real Estate & Property",
+  "Finance & Banking",
+  "Education & E-Learning",
+  "Hospitality & Tourism",
+  "Food & Beverage",
+  "Automotive",
+  "Fashion & Apparel",
+  "Beauty & Wellness",
+  "Legal & Professional Services",
+  "Construction & Architecture",
+  "Manufacturing & Industrial",
+  "Non-Profit & NGO",
+  "Entertainment & Media",
+  "Sports & Fitness",
+  "Agriculture & Farming",
+  "Energy & Environment",
+  "Logistics & Supply Chain",
+  "B2B SaaS",
+  "Government & Public Sector",
+  "Telecommunications",
+  "Insurance",
+  "Travel & Aviation",
+  "Other",
+];
+
+const CURRENCIES = [
+  { code: "USD", symbol: "$", name: "US Dollar" },
+  { code: "EUR", symbol: "€", name: "Euro" },
+  { code: "GBP", symbol: "£", name: "British Pound" },
+  { code: "INR", symbol: "₹", name: "Indian Rupee" },
+  { code: "AED", symbol: "د.إ", name: "UAE Dirham" },
+  { code: "AUD", symbol: "A$", name: "Australian Dollar" },
+  { code: "CAD", symbol: "C$", name: "Canadian Dollar" },
+  { code: "SGD", symbol: "S$", name: "Singapore Dollar" },
+  { code: "JPY", symbol: "¥", name: "Japanese Yen" },
+  { code: "BRL", symbol: "R$", name: "Brazilian Real" },
+  { code: "MXN", symbol: "$", name: "Mexican Peso" },
+  { code: "ZAR", symbol: "R", name: "South African Rand" },
+  { code: "CHF", symbol: "Fr", name: "Swiss Franc" },
+  { code: "HKD", symbol: "HK$", name: "Hong Kong Dollar" },
+  { code: "SAR", symbol: "﷼", name: "Saudi Riyal" },
+  { code: "PKR", symbol: "₨", name: "Pakistani Rupee" },
+  { code: "NGN", symbol: "₦", name: "Nigerian Naira" },
+  { code: "EGP", symbol: "£", name: "Egyptian Pound" },
+  { code: "KES", symbol: "KSh", name: "Kenyan Shilling" },
+  { code: "TRY", symbol: "₺", name: "Turkish Lira" },
+  { code: "SEK", symbol: "kr", name: "Swedish Krona" },
+  { code: "NOK", symbol: "kr", name: "Norwegian Krone" },
+  { code: "DKK", symbol: "kr", name: "Danish Krone" },
+  { code: "THB", symbol: "฿", name: "Thai Baht" },
+  { code: "MYR", symbol: "RM", name: "Malaysian Ringgit" },
+  { code: "IDR", symbol: "Rp", name: "Indonesian Rupiah" },
+  { code: "PHP", symbol: "₱", name: "Philippine Peso" },
+  { code: "NZD", symbol: "NZ$", name: "New Zealand Dollar" },
+  { code: "BDT", symbol: "৳", name: "Bangladeshi Taka" },
+  { code: "LKR", symbol: "₨", name: "Sri Lankan Rupee" },
+];
+
 const formSchema = z.object({
   serviceType: z.enum(ALL_SERVICE_IDS),
   agencyName: z.string().min(2, "Agency name is required"),
@@ -42,6 +104,7 @@ const formSchema = z.object({
   clientCompany: z.string().min(2, "Company name is required"),
   clientIndustry: z.string().optional(),
   clientGoals: z.string().min(10, "Please describe the client's goals"),
+  currency: z.string().optional(),
   budget: z.string().optional(),
   language: z.string().optional(),
   tone: z.enum(["formal", "balanced", "conversational"]).optional(),
@@ -72,6 +135,7 @@ export default function Generate() {
       clientCompany: "",
       clientIndustry: "",
       clientGoals: "",
+      currency: "USD",
       budget: "",
       language: "English",
       tone: "balanced",
@@ -337,20 +401,29 @@ export default function Generate() {
                       <FormField control={form.control} name="clientIndustry" render={({ field }) => (
                         <FormItem>
                           <FormLabel>Industry</FormLabel>
-                          <FormControl><Input placeholder="e.g. Real Estate" {...field} /></FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger><SelectValue placeholder="Select industry" /></SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {INDUSTRIES.map(ind => (
+                                <SelectItem key={ind} value={ind}>{ind}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )} />
-                      <FormField control={form.control} name="budget" render={({ field }) => (
+                      <FormField control={form.control} name="currency" render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Budget Range</FormLabel>
+                          <FormLabel>Currency</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger><SelectValue placeholder="Select budget" /></SelectTrigger>
+                              <SelectTrigger><SelectValue placeholder="Select currency" /></SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {["Under $1,000/month","$1,000–$2,500/month","$2,500–$5,000/month","$5,000–$10,000/month","$10,000+/month"].map(b => (
-                                <SelectItem key={b} value={b}>{b}</SelectItem>
+                              {CURRENCIES.map(c => (
+                                <SelectItem key={c.code} value={c.code}>{c.symbol} {c.code} — {c.name}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
@@ -358,6 +431,34 @@ export default function Generate() {
                         </FormItem>
                       )} />
                     </div>
+                    <FormField control={form.control} name="budget" render={({ field }) => {
+                      const selectedCurrency = form.watch("currency") || "USD";
+                      const curr = CURRENCIES.find(c => c.code === selectedCurrency) || CURRENCIES[0];
+                      const sym = curr.symbol;
+                      const budgetOptions = [
+                        `Under ${sym}1,000/month`,
+                        `${sym}1,000–${sym}2,500/month`,
+                        `${sym}2,500–${sym}5,000/month`,
+                        `${sym}5,000–${sym}10,000/month`,
+                        `${sym}10,000+/month`,
+                      ];
+                      return (
+                        <FormItem>
+                          <FormLabel>Budget Range</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger><SelectValue placeholder="Select budget" /></SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {budgetOptions.map(b => (
+                                <SelectItem key={b} value={b}>{b}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }} />
                     <FormField control={form.control} name="clientGoals" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Client Goals & Description <span className="text-destructive">*</span></FormLabel>

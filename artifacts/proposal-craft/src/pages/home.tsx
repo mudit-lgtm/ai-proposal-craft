@@ -174,7 +174,7 @@ export default function Home() {
   return (
     <Layout>
       {/* Hero */}
-      <section className="relative overflow-hidden pt-20 pb-14 sm:pt-28 sm:pb-20 md:pt-36 md:pb-28 bg-gradient-to-b from-primary/5 to-background">
+      <section className="relative overflow-hidden pt-16 pb-10 sm:pt-24 sm:pb-14 md:pt-28 md:pb-16 bg-gradient-to-b from-primary/5 to-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full mb-6 border border-primary/20">
@@ -212,24 +212,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Service pills scrollbar */}
-      <section className="py-6 border-b border-border bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="flex overflow-x-auto pb-2 -mb-2 hide-scrollbar gap-2 snap-x">
-            {SERVICES.map((s, i) => (
-              <div key={i} className={`snap-center whitespace-nowrap px-4 py-2 rounded-full ${s.bg} ${s.border} border text-xs font-semibold ${s.color} flex-shrink-0 flex items-center gap-1.5`}>
-                <span className="h-3.5 w-3.5 inline-flex">{s.icon}</span>
-                {s.title}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* How It Works */}
-      <section id="how-it-works" className="py-16 sm:py-24 md:py-32 bg-background">
+      <section id="how-it-works" className="py-10 sm:py-16 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
+          <div className="text-center mb-8 sm:mb-10">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">How It Works</h2>
             <p className="mt-4 text-base sm:text-lg text-muted-foreground">Four simple steps to a winning proposal.</p>
           </div>
@@ -253,9 +239,9 @@ export default function Home() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-16 sm:py-24 md:py-32 bg-muted/30">
+      <section className="py-10 sm:py-16 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
+          <div className="text-center mb-8 sm:mb-10">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">15 Supported Service Types</h2>
             <p className="mt-4 text-base sm:text-lg text-muted-foreground">Tailored AI proposals for every digital marketing discipline.</p>
           </div>
@@ -278,9 +264,9 @@ export default function Home() {
       </section>
 
       {/* Template Showcase — REAL previews */}
-      <section className="py-16 sm:py-24 md:py-32 bg-background">
+      <section className="py-10 sm:py-16 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
+          <div className="text-center mb-8 sm:mb-10">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">6 Professional Templates</h2>
             <p className="mt-4 text-base sm:text-lg text-muted-foreground">Make the right impression with agency-grade designs.</p>
           </div>
@@ -330,9 +316,9 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="py-16 sm:py-24 md:py-32 bg-muted/30">
+      <section id="features" className="py-10 sm:py-16 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
+          <div className="text-center mb-8 sm:mb-10">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Everything You Need</h2>
             <p className="mt-4 text-base sm:text-lg text-muted-foreground">Powerful features to help you close more deals faster.</p>
           </div>
@@ -366,9 +352,9 @@ export default function Home() {
       </section>
 
       {/* WHY US — Comparison Table */}
-      <section className="py-16 sm:py-24 md:py-32 bg-background">
+      <section className="py-10 sm:py-16 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
+          <div className="text-center mb-8 sm:mb-10">
             <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full mb-4 border border-green-200">
               <Check className="h-3.5 w-3.5" /> Why Choose ProposalCraft?
             </div>
@@ -420,7 +406,7 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-16 sm:py-24 md:py-32 bg-muted/30">
+      <section id="pricing" className="py-10 sm:py-16 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 sm:mb-12">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Simple, Transparent Pricing</h2>
@@ -493,9 +479,9 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 sm:py-24 md:py-32 bg-background overflow-hidden">
+      <section className="py-10 sm:py-16 bg-background overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
+          <div className="text-center mb-8 sm:mb-10">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Trusted by Professionals</h2>
             <p className="mt-4 text-base sm:text-lg text-muted-foreground">Hear what marketing agencies are saying.</p>
           </div>
@@ -542,7 +528,7 @@ export default function Home() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 sm:py-24 md:py-32 bg-muted/30 border-t border-border">
+      <section className="py-10 sm:py-16 bg-muted/30 border-t border-border">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
           <div className="text-center mb-10 sm:mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Frequently Asked Questions</h2>
