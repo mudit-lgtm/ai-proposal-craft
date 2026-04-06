@@ -86,7 +86,7 @@ Make it highly professional, specific to the service type and client industry, a
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-5.2",
+      model: "gpt-4o-mini",
       max_completion_tokens: 8192,
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
@@ -154,7 +154,7 @@ Write ONLY the "${sectionKey}" section. ${sectionDesc}. Return ONLY the plain te
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-5.2",
+      model: "gpt-4o-mini",
       max_completion_tokens: 2048,
       messages: [{ role: "user", content: prompt }],
     });
@@ -199,7 +199,7 @@ Return ONLY valid JSON with exactly these keys:
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-5.2",
+      model: "gpt-4o-mini",
       max_completion_tokens: 1024,
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },

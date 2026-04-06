@@ -580,7 +580,7 @@ export default function Generate() {
                   <Loader2 className="h-12 w-12 text-primary animate-spin mb-6" />
                   <h3 className="text-xl font-bold mb-2">Generating your proposal...</h3>
                   <p className="text-muted-foreground text-sm">
-                    Our AI is crafting a customized, persuasive proposal. This usually takes about 10–15 seconds.
+                    Our AI is crafting a customized, persuasive proposal. This usually takes 15–30 seconds.
                   </p>
                 </div>
               </div>
