@@ -222,9 +222,14 @@ export default function Generate() {
       saveProposal(newProposal);
       toast.success("Proposal generated successfully!");
       setLocation(`/proposal/${newProposal.id}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error("Failed to generate proposal. Please try again.");
+      const apiError = error as { status?: number; data?: { error?: string; message?: string } };
+      if (apiError?.status === 429 || apiError?.data?.error === "free_limit_reached") {
+        toast.error("Free limit reached — you've used all 3 free proposals from your network. Upgrade to Pro for unlimited access.", { duration: 8000 });
+      } else {
+        toast.error("Failed to generate proposal. Please try again.");
+      }
     }
   }
 

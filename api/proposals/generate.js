@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getClientIp, checkRateLimit, incrementUsage } from "../_ratelimit.js";
 
 const SERVICE_TYPE_LABELS = {
   seo: "Search Engine Optimization (SEO)",
@@ -31,6 +32,18 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const ip = getClientIp(req);
+  const limit = await checkRateLimit(ip);
+
+  if (!limit.allowed) {
+    return res.status(429).json({
+      error: "free_limit_reached",
+      message: `You have used all ${limit.max} free proposals. Upgrade to Pro for unlimited access.`,
+      used: limit.used,
+      max: limit.max,
+    });
+  }
 
   const {
     serviceType, agencyName, agencyContact, clientName, clientCompany,
@@ -81,6 +94,8 @@ Make it highly professional, specific to the service type and client industry, a
     const result = await model.generateContent(prompt);
     const text = result.response.text();
     const proposalData = JSON.parse(text);
+
+    await incrementUsage(ip);
 
     return res.json({
       ...proposalData,
