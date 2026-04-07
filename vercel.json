@@ -1,0 +1,14 @@
+{
+  "buildCommand": "npm install -g pnpm@10 && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/proposal-craft run build",
+  "installCommand": "echo 'skipping default install'",
+  "outputDirectory": "artifacts/proposal-craft/dist/public",
+  "framework": null,
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  }
+}
