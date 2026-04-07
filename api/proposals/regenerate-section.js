@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const SERVICE_TYPE_LABELS = {
   seo: "Search Engine Optimization (SEO)",
@@ -29,13 +29,8 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const { sectionKey, serviceType, agencyName, clientName, clientCompany, clientGoals, tone, language } = req.body;
 
@@ -43,7 +38,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    generationConfig: { maxOutputTokens: 2048 },
+  });
 
   const serviceLabel = SERVICE_TYPE_LABELS[serviceType] || serviceType;
   const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.balanced;
@@ -75,17 +74,8 @@ Context:
 Write ONLY the "${sectionKey}" section. ${sectionDesc}. Return ONLY the plain text content (no JSON wrapper, no section title, just the section body text). Make it fresh, specific, and different from a generic template.`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      max_completion_tokens: 2048,
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
-      return res.status(500).json({ error: "No response from AI" });
-    }
-
+    const result = await model.generateContent(prompt);
+    const content = result.response.text();
     return res.json({ content: content.trim() });
   } catch (err) {
     console.error("Error regenerating section:", err);

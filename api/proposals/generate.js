@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const SERVICE_TYPE_LABELS = {
   seo: "Search Engine Optimization (SEO)",
@@ -29,33 +29,23 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const {
-    serviceType,
-    agencyName,
-    agencyContact,
-    clientName,
-    clientCompany,
-    clientIndustry,
-    clientGoals,
-    budget,
-    language,
-    tone,
-    validityDays,
+    serviceType, agencyName, agencyContact, clientName, clientCompany,
+    clientIndustry, clientGoals, budget, language, tone, validityDays,
   } = req.body;
 
   if (!serviceType || !agencyName || !clientName || !clientCompany || !clientGoals) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 },
+  });
 
   const serviceLabel = SERVICE_TYPE_LABELS[serviceType] || serviceType;
   const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
@@ -88,25 +78,13 @@ Write a comprehensive, professional proposal with exactly these 7 sections. Retu
 Make it highly professional, specific to the service type and client industry, and persuasive. Use industry-specific terminology. Each section should be substantive (not generic filler).`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      max_completion_tokens: 8192,
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-    });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    const proposalData = JSON.parse(text);
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
-      return res.status(500).json({ error: "No response from AI" });
-    }
-
-    const proposalData = JSON.parse(content);
     return res.json({
       ...proposalData,
-      serviceType,
-      agencyName,
-      clientName,
-      clientCompany,
+      serviceType, agencyName, clientName, clientCompany,
       generatedAt: new Date().toISOString(),
     });
   } catch (err) {

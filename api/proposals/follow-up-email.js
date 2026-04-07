@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const SERVICE_TYPE_LABELS = {
   seo: "Search Engine Optimization (SEO)",
@@ -23,13 +23,8 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const { agencyName, clientName, clientCompany, serviceType } = req.body;
 
@@ -37,7 +32,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    generationConfig: { responseMimeType: "application/json", maxOutputTokens: 1024 },
+  });
+
   const serviceLabel = SERVICE_TYPE_LABELS[serviceType] || serviceType;
 
   const prompt = `Write a professional follow-up email from ${agencyName} to ${clientName} at ${clientCompany} about a ${serviceLabel} proposal that was previously sent.
@@ -56,19 +56,9 @@ Return ONLY valid JSON with exactly these keys:
 }`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      max_completion_tokens: 1024,
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-    });
-
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
-      return res.status(500).json({ error: "No response from AI" });
-    }
-
-    return res.json(JSON.parse(content));
+    const result = await model.generateContent(prompt);
+    const emailData = JSON.parse(result.response.text());
+    return res.json(emailData);
   } catch (err) {
     console.error("Error generating follow-up email:", err);
     return res.status(500).json({ error: "Failed to generate follow-up email" });
