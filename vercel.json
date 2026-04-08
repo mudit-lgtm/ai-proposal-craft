@@ -1,5 +1,5 @@
 {
-  "installCommand": "pnpm install --no-frozen-lockfile",
+  "installCommand": "pnpm install --no-frozen-lockfile && cd api && npm install --production",
   "buildCommand": "pnpm --filter @workspace/proposal-craft run build",
   "outputDirectory": "artifacts/proposal-craft/dist/public",
   "framework": null,
