@@ -194,7 +194,11 @@ export default function Generate() {
             const actual = values.actualPrice?.trim();
             const discounted = values.discountedPrice?.trim();
             if (!actual) return undefined;
-            if (discounted && discounted !== actual) return `${sym}${actual} (discounted to ${sym}${discounted})`;
+            const actualNum = parseFloat(actual.replace(/,/g, ""));
+            const discountedNum = discounted ? parseFloat(discounted.replace(/,/g, "")) : NaN;
+            if (discounted && !isNaN(discountedNum) && discountedNum < actualNum) {
+              return `${sym}${actual} (discounted to ${sym}${discounted})`;
+            }
             return `${sym}${actual}`;
           })(),
           language: values.language,
