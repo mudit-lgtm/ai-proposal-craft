@@ -1,9 +1,24 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { FileText, ChevronRight, ShieldCheck, LogOut, Menu, X, Building2 } from "lucide-react";
+import { ChevronRight, ShieldCheck, LogOut, Menu, X, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isAdminLoggedIn, adminLogout } from "@/lib/store";
-import { useState, useEffect } from "react";
 import { toast } from "sonner";
+
+function ProposalCraftLogo({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <rect width="32" height="32" rx="7" fill="#0d9488" />
+      <rect x="8" y="7" width="13" height="17" rx="2" fill="white" opacity="0.95" />
+      <rect x="10.5" y="10" width="8" height="1.5" rx="0.75" fill="#0d9488" />
+      <rect x="10.5" y="13" width="6" height="1.5" rx="0.75" fill="#0d9488" />
+      <rect x="10.5" y="16" width="7" height="1.5" rx="0.75" fill="#0d9488" />
+      <circle cx="23" cy="10" r="5" fill="#f0fdf9" />
+      <path d="M23 7.5v5M20.5 10h5" stroke="#0d9488" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M22 12.5l1.5 1.5 2.5-3" stroke="#0d9488" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 export function Navbar() {
   const [isAdmin, setIsAdmin] = useState(() => isAdminLoggedIn());
@@ -39,9 +54,7 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <FileText className="h-5 w-5" />
-          </div>
+          <ProposalCraftLogo className="h-8 w-8" />
           <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
             ProposalCraft <span className="text-primary">AI</span>
           </span>

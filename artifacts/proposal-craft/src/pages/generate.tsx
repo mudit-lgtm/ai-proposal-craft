@@ -105,7 +105,8 @@ const formSchema = z.object({
   clientIndustry: z.string().optional(),
   clientGoals: z.string().min(10, "Please describe the client's goals"),
   currency: z.string().optional(),
-  budget: z.string().optional(),
+  actualPrice: z.string().optional(),
+  discountedPrice: z.string().optional(),
   language: z.string().optional(),
   tone: z.enum(["formal", "balanced", "conversational"]).optional(),
   validityDays: z.number().optional(),
@@ -136,7 +137,8 @@ export default function Generate() {
       clientIndustry: "",
       clientGoals: "",
       currency: "USD",
-      budget: "",
+      actualPrice: "",
+      discountedPrice: "",
       language: "English",
       tone: "balanced",
       validityDays: 30,
@@ -186,7 +188,15 @@ export default function Generate() {
           clientCompany: values.clientCompany,
           clientIndustry: values.clientIndustry,
           clientGoals: values.clientGoals,
-          budget: values.budget,
+          budget: (() => {
+            const curr = CURRENCIES.find(c => c.code === (values.currency || "USD")) || CURRENCIES[0];
+            const sym = curr.symbol;
+            const actual = values.actualPrice?.trim();
+            const discounted = values.discountedPrice?.trim();
+            if (!actual) return undefined;
+            if (discounted && discounted !== actual) return `${sym}${actual} (discounted to ${sym}${discounted})`;
+            return `${sym}${actual}`;
+          })(),
           language: values.language,
           tone: values.tone,
           validityDays: values.validityDays,
@@ -436,34 +446,51 @@ export default function Generate() {
                         </FormItem>
                       )} />
                     </div>
-                    <FormField control={form.control} name="budget" render={({ field }) => {
+                    {(() => {
                       const selectedCurrency = form.watch("currency") || "USD";
                       const curr = CURRENCIES.find(c => c.code === selectedCurrency) || CURRENCIES[0];
                       const sym = curr.symbol;
-                      const budgetOptions = [
-                        `Under ${sym}1,000/month`,
-                        `${sym}1,000–${sym}2,500/month`,
-                        `${sym}2,500–${sym}5,000/month`,
-                        `${sym}5,000–${sym}10,000/month`,
-                        `${sym}10,000+/month`,
-                      ];
                       return (
-                        <FormItem>
-                          <FormLabel>Budget Range</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger><SelectValue placeholder="Select budget" /></SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {budgetOptions.map(b => (
-                                <SelectItem key={b} value={b}>{b}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField control={form.control} name="actualPrice" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Actual Price <span className="text-muted-foreground text-xs">(optional)</span></FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm select-none">{sym}</span>
+                                  <Input
+                                    type="text"
+                                    inputMode="numeric"
+                                    placeholder="e.g. 5000"
+                                    className="pl-8"
+                                    {...field}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                          <FormField control={form.control} name="discountedPrice" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Discounted Price <span className="text-muted-foreground text-xs">(optional)</span></FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm select-none">{sym}</span>
+                                  <Input
+                                    type="text"
+                                    inputMode="numeric"
+                                    placeholder="e.g. 4000"
+                                    className="pl-8"
+                                    {...field}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                        </div>
                       );
-                    }} />
+                    })()}
                     <FormField control={form.control} name="clientGoals" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Client Goals & Description <span className="text-destructive">*</span></FormLabel>
