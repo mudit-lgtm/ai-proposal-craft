@@ -1,5 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 const SERVICE_TYPE_LABELS = {
   seo: "Search Engine Optimization (SEO)",
   website: "Website Design & Development",
@@ -32,21 +30,26 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { sectionKey, serviceType, agencyName, clientName, clientCompany, clientGoals, tone, language } = req.body;
+  const {
+    sectionKey, serviceType, agencyName, clientName,
+    clientCompany, clientGoals, tone, language,
+  } = req.body;
 
   if (!sectionKey || !serviceType || !agencyName || !clientName || !clientCompany) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
-    generationConfig: { maxOutputTokens: 2048 },
-  });
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+  if (!GEMINI_API_KEY) {
+    return res.status(500).json({ error: "Gemini API key not configured on server." });
+  }
 
   const serviceLabel = SERVICE_TYPE_LABELS[serviceType] || serviceType;
   const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.balanced;
-  const languageInstruction = language && language !== "English" ? `Write in ${language}.` : "Write in English.";
+  const languageInstruction = language && language !== "English"
+    ? `Write in ${language}.`
+    : "Write in English.";
 
   const sectionDescriptions = {
     executiveSummary: "A compelling 2-3 paragraph executive summary that captures the opportunity and demonstrates understanding of the client's needs",
@@ -74,9 +77,37 @@ Context:
 Write ONLY the "${sectionKey}" section. ${sectionDesc}. Return ONLY the plain text content (no JSON wrapper, no section title, just the section body text). Make it fresh, specific, and different from a generic template.`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const content = result.response.text();
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            maxOutputTokens: 2048,
+            temperature: 0.8,
+          },
+        }),
+      }
+    );
+
+    if (!geminiRes.ok) {
+      const errData = await geminiRes.json();
+      const errMsg = errData?.error?.message || "Gemini API error";
+      console.error("Gemini API error:", errMsg);
+      return res.status(502).json({ error: errMsg });
+    }
+
+    const geminiData = await geminiRes.json();
+    const content = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!content) {
+      return res.status(502).json({ error: "Empty response from Gemini" });
+    }
+
     return res.json({ content: content.trim() });
+
   } catch (err) {
     console.error("Error regenerating section:", err);
     return res.status(500).json({ error: "Failed to regenerate section" });
