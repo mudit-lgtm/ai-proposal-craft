@@ -1,4 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getClientIp, checkRateLimit, incrementUsage } from "../_ratelimit.js";
 
 const SERVICE_TYPE_LABELS = {
@@ -54,16 +53,18 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
-    generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 },
-  });
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+  if (!GEMINI_API_KEY) {
+    return res.status(500).json({ error: "Gemini API key not configured on server." });
+  }
 
   const serviceLabel = SERVICE_TYPE_LABELS[serviceType] || serviceType;
   const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.balanced;
-  const languageInstruction = language && language !== "English" ? `Write the entire proposal in ${language}.` : "Write in English.";
+  const languageInstruction = language && language !== "English"
+    ? `Write the entire proposal in ${language}.`
+    : "Write in English.";
 
   const prompt = `You are an expert digital marketing proposal writer. Create a professional business proposal for ${agencyName} to present to ${clientName} at ${clientCompany}.
 
@@ -91,17 +92,62 @@ Write a comprehensive, professional proposal with exactly these 7 sections. Retu
 Make it highly professional, specific to the service type and client industry, and persuasive. Use industry-specific terminology. Each section should be substantive (not generic filler).`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    const proposalData = JSON.parse(text);
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            maxOutputTokens: 8192,
+            temperature: 0.7,
+          },
+        }),
+      }
+    );
+
+    if (!geminiRes.ok) {
+      const errData = await geminiRes.json();
+      const errMsg = errData?.error?.message || "Gemini API error";
+      console.error("Gemini API error:", errMsg);
+      return res.status(502).json({ error: errMsg });
+    }
+
+    const geminiData = await geminiRes.json();
+    const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!rawText) {
+      return res.status(502).json({ error: "Empty response from Gemini" });
+    }
+
+    // Clean markdown code fences if Gemini wraps response
+    const cleaned = rawText
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/```\s*$/i, "")
+      .trim();
+
+    let proposalData;
+    try {
+      proposalData = JSON.parse(cleaned);
+    } catch (parseErr) {
+      console.error("JSON parse error:", parseErr.message, "Raw:", cleaned.slice(0, 200));
+      return res.status(502).json({ error: "Invalid JSON from Gemini. Try again." });
+    }
 
     await incrementUsage(ip);
 
     return res.json({
       ...proposalData,
-      serviceType, agencyName, clientName, clientCompany,
+      serviceType,
+      agencyName,
+      clientName,
+      clientCompany,
       generatedAt: new Date().toISOString(),
     });
+
   } catch (err) {
     console.error("Error generating proposal:", err);
     return res.status(500).json({ error: "Failed to generate proposal" });
